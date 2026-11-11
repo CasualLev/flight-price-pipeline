@@ -1,0 +1,20 @@
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Airflow runtime files
+logs/*
+!logs/.gitkeep
+
+# Data: downloaded, not committed
+data/raw/*
+!data/raw/.gitkeep
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
