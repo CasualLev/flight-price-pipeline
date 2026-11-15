@@ -20,11 +20,16 @@ def transform_and_compute_kpis():
     df = pd.read_sql(f"SELECT * FROM {VALIDATED_TABLE}", engine)
     log.info("Transforming %d validated rows", len(df))
 
-    # --- Transformation 1: Total Fare = Base Fare + Tax & Surcharge ---
+        # --- Transformation 1: Total Fare ---
+    # Only calculate Total Fare where it is missing. Never overwrite source values.
     computed = df["base_fare_bdt"] + df["tax_surcharge_bdt"]
-    wrong = df["total_fare_bdt"].isna() | ((df["total_fare_bdt"] - computed).abs() > 1)
-    df.loc[wrong, "total_fare_bdt"] = computed[wrong]
-    log.info("Total fare recalculated for %d rows", int(wrong.sum()))
+    missing = df["total_fare_bdt"].isna()
+    df.loc[missing, "total_fare_bdt"] = computed[missing]
+    log.info("Total fare calculated for %d rows where it was missing", int(missing.sum()))
+
+    # Flag rows where the source total differs from base + tax (kept unchanged).
+    df["fare_mismatch"] = ((df["total_fare_bdt"] - computed).abs() > 1).astype(int)
+    log.info("Rows flagged with fare_mismatch (kept as-is): %d", int(df["fare_mismatch"].sum()))
 
     # --- Transformation 2: enrich with useful columns ---
     df["departure_date_time"] = pd.to_datetime(df["departure_date_time"], errors="coerce")
