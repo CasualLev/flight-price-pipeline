@@ -11,3 +11,8 @@ REJECTED_TABLE = "rejected_flights"
 
 # If more than this share of rows is rejected, fail the task (and alert).
 MAX_REJECT_RATE = 0.05
+
+TRANSFORMED_TABLE = "flights_transformed"
+
+# Seasonality values that count as NON-peak. Everything else is peak.
+NON_PEAK_SEASONS = ["Regular"]
