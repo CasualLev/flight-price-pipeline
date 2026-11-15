@@ -5,6 +5,7 @@ from airflow.sdk import dag, task
 
 from flight_pipeline.alerts import task_failure_alert
 from flight_pipeline.ingest import load_csv_to_mysql
+from flight_pipeline.validate import validate_staging_data
 
 default_args = {
     "owner": "data-team",
@@ -28,7 +29,11 @@ def flight_price_pipeline():
     def ingest_csv():
         return load_csv_to_mysql()
 
-    ingest_csv()
+    @task
+    def validate():
+        return validate_staging_data()
+
+    ingest_csv() >> validate()
 
 
 flight_price_pipeline()
